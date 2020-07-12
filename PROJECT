@@ -1,0 +1,10 @@
+domain: benfiola.dev
+repo: github.com/benfiola/sopserator
+resources:
+- group: sopserator
+  kind: SOPSSecret
+  version: v1alpha1
+- group: sopserator
+  kind: SOPSKey
+  version: v1alpha1
+version: "2"

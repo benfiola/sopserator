@@ -1,0 +1,65 @@
+apiVersion: sopserator.benfiola.dev/v1alpha1
+kind: SOPSKey
+metadata:
+  creationTimestamp: null
+  name: secretkey
+spec:
+  pgp:
+    key: |
+      -----BEGIN PGP PRIVATE KEY BLOCK-----
+
+      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
+      =dQWD
+      -----END PGP PRIVATE KEY BLOCK-----

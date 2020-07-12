@@ -1,0 +1,7 @@
+apiVersion: sopserator.benfiola.dev/v1alpha1
+kind: SOPSKey
+metadata:
+  name: sopskey-sample
+spec:
+  # Add fields here
+  foo: bar
