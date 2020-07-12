@@ -84,7 +84,7 @@ func (r *SOPSSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			utils.ListRemoveString(sopsSecret.Finalizers, finalizerKey)
 			sopsSecret.Finalizers = utils.ListRemoveString(sopsSecret.Finalizers, finalizerKey)
 			log.Info("Deleting finalizer")
-			if err := r.Update(context.Background(), &sopsSecret); err != nil {
+			if err := r.Update(ctx, &sopsSecret); err != nil {
 				log.Error(err, "Failed to delete finalizer")
 				return ctrl.Result{}, err
 			}
@@ -100,7 +100,7 @@ func (r *SOPSSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 	if !utils.ListContainsString(sopsSecret.Finalizers, finalizerKey) {
 		log.Info("Adding finalizer")
 		sopsSecret.ObjectMeta.Finalizers = append(sopsSecret.ObjectMeta.Finalizers, finalizerKey)
-		if err := r.Update(context.Background(), &sopsSecret); err != nil {
+		if err := r.Update(ctx, &sopsSecret); err != nil {
 			return ctrl.Result{}, err
 		}
 	}

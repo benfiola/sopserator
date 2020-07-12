@@ -74,7 +74,7 @@ func (r *SOPSKeyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 			// remove finalizer
 			sopsKey.Finalizers = utils.ListRemoveString(sopsKey.Finalizers, finalizerKey)
-			if err := r.Update(context.Background(), &sopsKey); err != nil {
+			if err := r.Update(ctx, &sopsKey); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -88,7 +88,7 @@ func (r *SOPSKeyReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	if !utils.ListContainsString(sopsKey.Finalizers, finalizerKey) {
 		log.Info("Adding finalizer")
 		sopsKey.ObjectMeta.Finalizers = append(sopsKey.ObjectMeta.Finalizers, finalizerKey)
-		if err := r.Update(context.Background(), &sopsKey); err != nil {
+		if err := r.Update(ctx, &sopsKey); err != nil {
 			return ctrl.Result{}, err
 		}
 	}
