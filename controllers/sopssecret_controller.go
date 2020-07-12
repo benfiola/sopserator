@@ -75,8 +75,8 @@ func (r *SOPSSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			for _, relatedSecret := range relatedSecrets.Items {
 				log.Info("Cleaning up Secret")
 				if err := r.Delete(ctx, &relatedSecret); err != nil {
-					// failing to clean up shouldn't break this loop
-					log.Error(err, "Failed to delete Secret")
+					log.Error(err, "Failed to delete related Secret")
+					return ctrl.Result{}, err
 				}
 			}
 
@@ -165,7 +165,7 @@ func (r *SOPSSecretReconciler) findRelatedSecrets(ctx context.Context, namespace
 }
 
 func (r *SOPSSecretReconciler) decryptSOPSSecret(sopsSecret *sopseratorv1alpha1.SOPSSecret, secret *corev1.Secret) error {
-	// marshal sopsSecret to YAML string
+	// marshal sopssecret to YAML string
 	serializer := json.NewSerializerWithOptions(
 		json.DefaultMetaFactory, nil, r.Scheme,
 		json.SerializerOptions{
@@ -178,12 +178,14 @@ func (r *SOPSSecretReconciler) decryptSOPSSecret(sopsSecret *sopseratorv1alpha1.
 	if err := serializer.Encode(sopsSecret, serializedEncrypted); err != nil {
 		return err
 	}
+
 	// decrypt YAML string
 	serializedDecrypted := bytes.NewBuffer([]byte{})
 	if err := sops.DecryptYAML(serializedEncrypted, serializedDecrypted, sops.DecryptYAMLOptions{IgnoreMac: true}); err != nil {
 		return err
 	}
-	// unmarshal decrypted YAML string back into SOPSSecret
+
+	// unmarshal decrypted YAML string back into sopssecret
 	gvk := sopsSecret.GroupVersionKind()
 	decrypted := sopsSecret.DeepCopy()
 	var _, _, decodingError = serializer.Decode(serializedDecrypted.Bytes(), &gvk, decrypted)
@@ -191,7 +193,7 @@ func (r *SOPSSecretReconciler) decryptSOPSSecret(sopsSecret *sopseratorv1alpha1.
 		return decodingError
 	}
 
-	// update Secret object with updated SOPSSecret data
+	// add decrypted data to secret.
 	secret.ObjectMeta.Labels = decrypted.Labels
 	secret.ObjectMeta.Annotations = decrypted.Annotations
 	if decrypted.Data != nil {
